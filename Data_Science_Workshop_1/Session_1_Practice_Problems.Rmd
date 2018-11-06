@@ -1,0 +1,22 @@
+---
+title: "Session 1- Practice Problems"
+author: "Saewon Park"
+date: "November 5, 2018"
+output: pdf_document
+---
+
+## Problem 1
+1. Load the civil war dataset.
+2. Select 3 numerical variables of interest. Create a data frame with just those three variables along with the variables “country” and “year.”
+3. Of those three variables that you selected, find their means, medians, maximums, and minimums.
+
+
+## Problem 2
+1. Using the data frame you created above, create a new data frame that only contains observations from Argentina, Chile, Paraguay, and Uruguay. Calculate the averages of those three variables that you selected.
+2. Select one of the three variables and calculate its average separately for Argentina and Chile. What is the difference in the two means?
+
+## Problem 3
+1. Using the original data, create a “dummy” variable for observations where the value is 1 if the country is located in Sub-Saharan Africa and 0 otherwise.
+2. Then create a data frame with only those observations from Sub-Saharan Africa. How many observations are there?
+
+3. Bonus: Can you create a dataframe for only oil-exporting countries in Sub-Saharan Africa? What is the median GDP per capita in these countries? How does this compare with all of the countries in Sub-Saharan Africa?

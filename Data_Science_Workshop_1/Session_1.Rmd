@@ -1,0 +1,417 @@
+---
+title: "Session_1"
+author: "Saewon Park"
+date: "November 3, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## Session 1: Basics ##
+
+R is object oriented. An object can be a value, vector, dataframe, list, plot, and even a function. 
+
+Anything you can save is an object and R works by calling these objects and using them.
+
+```{r}
+## An object can be a single value (aka- variable)
+
+#We assign a value to a variable using "<-"
+a <- 4 # 4 is assigned to "a"
+a # calling a
+a + 5 # since we assigned a numeric value to a, we can perform arithmetric operations on it 
+
+b <- 10
+a*b # objects can interact with each other
+
+c <- a*b # we can also assign variables to another variable
+c
+
+```
+
+
+
+## 2. Vectors
+
+We can also store multiple elements of the same type. This is called a vector.
+
+```{r}
+
+d <- c(1,2,3) #c() is short for concatenate
+d
+
+d <- 1:3 #a sequence of number 1 through 3
+
+d*10 #when the elements of a vector are all numbers, we can
+
+e <- c("Red", "Orange", "Green")
+e
+
+f <- c(d,e)
+f
+
+```
+
+
+### 2.1 Element types in R
+
+There are mainly three types of elements in R for vectors: numeric (including integer), character, and logical
+
+```{r}
+#we can check the data type of an object by using the class() function
+class(d)
+class(e)
+
+
+#the logical data type consists of TRUE and FALSE
+g <- c(TRUE, FALSE, T, T, F)
+class(g)
+
+```
+
+
+
+What do you think happens with vectors that have both numbers and character? Check the class of "f"
+
+
+
+```{r}
+
+class(f)
+#when numbers and characters are put in one vector, the numbers are coerced as characters
+
+```
+
+
+
+
+
+## 3. Subsetting
+
+The order of the elements in a vector are stored as an index. We can use indices to extract specific elements from a list.
+
+```{r}
+
+f[4] #extracting the 4th element from f
+f[4:6] #extracting the 4th to the 6th elements from f  
+f[c(1,5,7)] #extracting the first, 5th, 7th elements from f
+
+
+
+# We can use this to reassign values
+f[4] <- "Yellow" #assigning the 4th element of f the value "Yellow"
+f
+
+
+```
+
+
+
+
+
+## 4. Repeating, Sequences and Matrices
+
+### 4.1 Repetition
+
+```{r}
+
+# Our first function: rep()
+h <- rep(x ="Text", times = 5)
+h
+
+?rep # ?+function name/package name will bring up the help page
+     # you can always use google for help as well
+
+#we can also repeat a sequence of different elements
+h <- rep(1:3, 5) #if the arguments are in order, we can remove the "="
+h
+
+```
+
+
+### 4.2 Sequences  
+
+```{r}
+
+i <- seq(from = 30, to = 300, by = 1) # outputs a sequence of numbers from 30 to 300, increasing by 1 every time.
+i
+
+j <- seq(50, 200, 5)
+j
+
+```
+
+
+### 4.3 Matrices - a new data type
+
+Vectors stored data in one-dimension. Matries store data in two-dimensions. Matrices have rows and columns and they all have to be of the same element type.
+
+```{r}
+
+k <- cbind(i, j) #binding vectors i and j as columns
+
+l <- rbind(i, j) #binding vectors i and j as rows
+
+# Note: What do the warnings mean? What happened to the shorter vector in the matrices?
+
+```
+
+
+## Quick Review
+
+a) create a vector called x1 that contains the numbers 1, 10, and 20.
+b) create a vector called x2 that contains every number in the sequence 100, 95, 90, 85 ... -95, -100.
+c) create a vector called x3 that contains that first element of x1 and the 6th element of x2.
+
+
+
+
+```{r}
+
+#Answers
+
+x1 <- c(1, 10, 20)
+
+x2 <- seq(100, -100, -5)
+
+x3 <- c(x1[1], x2[6])
+
+
+```
+
+
+
+
+
+## 5. Importing Data
+
+Now, let's look at an actual dataset of civil wars.
+
+```{r}
+
+#setwd("/Users/saewonpark/Documents/McGill/DSC/")  #use the path of the directory with "fearon03.csv"
+
+civilwar <- read.csv("fearon03.csv")
+
+#This creates a dataframe, which is like a matrix but with row/column names. There can be different data type for each column
+class(civilwar)
+
+# Other packages you can use to open csv: foreign, readxl
+
+
+```
+
+
+## 6. Selecting within a dataframe
+
+Using column (variable) names
+
+```{r}
+
+#we can select a column using the column name
+civilwar$country
+
+#this only only returns the unique values
+unique(civilwar$country)
+
+#using unique() we create a vector of all the country names in the dataset
+country_names <- unique(civilwar$country)
+
+```
+
+
+Using indexing
+
+```{r}
+
+#like we did with vectors, we can subset dataframes and matrices using indices.
+#[row_number, column_number]
+
+civilwar[1, ] #first row, all columns
+civilwar[ ,2] #all rows, second column
+civilwar[1,2] #first row, second column
+civilwar[1, 2:4] #what would be the output of this?
+
+```
+
+
+Filtering through the dataset
+
+```{r}
+
+civilwar[civilwar$country == "CANADA", ] #gets all the observations where Canada is the country
+# notice that we use double equal sign for comparison (and single equal sign to assign variables)
+
+civilwar[civilwar$country == "CANADA", 8] #gets the 8th column (region) for just Canadian observations
+civilwar[civilwar$country == "CANADA", "gdppc"] #same as above, but using column name
+
+civilwar[civilwar$country == "CANADA" | civilwar$country == "USA", ] # | means or
+civilwar[civilwar$country == "CANADA" & civilwar$country == "USA", ] # & means and
+civilwar[civilwar$country %in% c("CANADA","USA"), ] # %in% finds matches between the vectors coming before and after this special notation
+
+
+```
+
+Creating new dataframes from subsets
+
+```{r}
+
+# New matrices:
+# by row filter:
+canada <- civilwar[civilwar$country == "CANADA", ]
+canusa <- civilwar[civilwar$country %in% c("CANADA","USA"), ] 
+
+# by column filter: 
+gdppop <- civilwar[ , c("gdppc", "pop")]
+
+```
+
+
+
+## Quick Review
+
+a) create a vector called regions that lists all unique regions in the dataset
+b) subset the civilwar dataset to include only BURUNDI, ITALY, and ALBANIA, assign this to a new variable called bur_ita_alb
+
+
+```{r}
+
+#Answers
+
+regions <- unique(civilwar$region)
+#or
+regions <- unique(civilwar[ , 8])
+
+bur_ita_alb <- civilwar[civilwar$country %in% c("BURUNDI", "ITALY", "ALBANIA"), ]
+#or
+bur_ita_alb <- civilwar[civilwar$country == "BURUNDI" |
+                          civilwar$country == "ITALY" |
+                          civilwar$country == "ALBANIA", ]
+
+```
+
+
+
+## 7. Descriptive Statistics
+
+```{r}
+
+sum(civilwar$war) #sum of all instances of war
+
+mean(civilwar$war) #mean of whether there is a war or not
+
+mean(civilwar$polity2) #mean() does not work when there are NAs
+
+
+
+#Other useful functions for descriptives:
+
+is.na(civilwar$polity2) #checks if there are any NAs in this vector
+sum(is.na(civilwar$polity2)) #sums up all instances of NAs
+
+mean(civilwar$polity2, na.rm = TRUE) #we can remove the NAs and then take the mean
+
+#minimum and maximum
+min(civilwar$war)
+max(civilwar$war)
+
+median(civilwar$polity2)
+
+#summary statistics at a glance
+summary(civilwar$polity2)
+summary(civilwar$region)
+
+#you can use summary() for the entire dataset
+summary(civilwar)
+
+#counts the number of observations.
+nrow(civilwar)
+
+
+
+# Subsetting + Descriptive statistics
+mean(civilwar$gdppc[civilwar$country == "CANADA"]) #mean of the gdp per capita for Canadian observations
+
+civilwar$country[civilwar$mtn == max(civilwar$mtn, na.rm = TRUE)] #country with the highest percentage of mountains
+# Note that this command evaluates all rows to see if the max() statement is true
+
+unique(civilwar$country[civilwar$mtn == max(civilwar$mtn, na.rm = TRUE)]) #to get just one value as the output
+
+
+```
+
+
+
+## 8. Creating new variables
+
+```{r}
+summary(civilwar$pop)
+
+hist(civilwar$pop) #histogram of population (shows distribution)
+
+civilwar$popln <- log(civilwar$pop) #creating a new variable for the log of population
+View(civilwar)
+hist(civilwar$popln) #histogram of new variable
+
+summary(civilwar$polity2)
+civilwar$democracy <- ifelse(civilwar$polity2 > 5, 1, 0) #ifelse function
+#creating a dummy variables that defines all countries with a polity score greater than 5 as a democracy
+
+mean(civilwar$democracy, na.rm = TRUE)
+
+
+```
+
+
+
+## 9. Recoding variables 
+
+In most datasets you will work with, there will be issues in the dataset that requires fixing. This stage is called data cleaning.
+
+
+```{r}
+## Problem: Mountainous terrain codes missing data as -99 instead of NA
+summary(civilwar$mtn) #this skews the mean
+
+#recode -99 as NA
+civilwar$mtn[civilwar$mtn == -99] <- NA
+
+# Or, recode using ifelse
+civilwar$mtn2 <- ifelse(civilwar$mtn == -99, NA, civilwar$mtn)
+
+summary(civilwar$mtn)
+summary(civilwar$mtn2)
+
+
+# Some numeric variables may have been changed into character type. To change it back to numeric:
+civilwar$pop <- as.character(civilwar$pop) #change column to character
+class(civilwar$pop)
+civilwar$pop <- as.numeric(civilwar$pop) #change back to numeric
+class(civilwar$pop)
+
+# Using dplyr's group_by() and mutate() functions -- next week! 
+
+```
+
+
+
+## 10. Saving data
+
+```{r}
+write.csv(civilwar, "fearon03_v2.csv")
+```
+
+
+
+## 11. Clearing environment
+
+```{r}
+remove(list = ls())
+```
+
+
+
