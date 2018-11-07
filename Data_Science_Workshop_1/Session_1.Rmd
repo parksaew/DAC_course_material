@@ -155,6 +155,14 @@ f[4] <- "Yellow" #assigning the 4th element of f the value "Yellow"
 f
 
 
+
+#real life example - for data that changes often, knowing how to reassign values will be very useful
+
+trump_cabinet <- c("Pence", "Pompeo", "Sessions", "Mattis") # example of something that changes quite often
+trump_cabinet[3] <- "Whitaker"
+
+
+
 ```
 
 
