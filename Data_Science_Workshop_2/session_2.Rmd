@@ -191,3 +191,44 @@ civilwar %>%
 Take note of what we did here: we took the civilwar dataset, selected the `country`, `pop` and `gdppc` variables, then we piped this restricted dataset into the filter function, where we selected Mexico, Latvia, Belarus, and Yemen. Next, we piped the selected and filtered dataset into the `mutate()` function to add a logged population variable. 
 
 ## Summarize function
+
+`dplyr`'s `summarise()` function is also a powerful tool for creating descriptive statistics. Let's get the mean value for the `polity2` variable: 
+
+```{r eval = FALSE}
+civilwar %>%
+  summarise(democracy_mean = mean(polity2, na.rm = T))
+```
+
+Because this dataset has observations for many years, let's get the population mean for the year 1999. First, we filter the data to include only observations from 1999, then we run the `summarise()` function:
+
+```{r eval = FALSE}
+civilwar %>%
+  filter(year == 1999) %>%
+  summarise(democracy_mean = mean(polity2, na.rm = T))
+```
+
+Let's compare this to an earlier year and see if the world got more democratic:
+
+```{r eval = FALSE}
+civilwar %>%
+  filter(year == 1980) %>%
+  summarise(democracy_mean = mean(polity2, na.rm = T))
+```
+It looks like the world got more democratic. We are happy about this. Yet, we suspect that these mean values are masking variation across the world's region. Luckily, we can use `group_by()` in combination with summary `summarise()` to get region specific means:
+
+```{r eval = FALSE}
+civilwar %>%
+  filter(year == 1999) %>%
+  group_by(region) %>%
+  summarise(democracy_mean = mean(polity2, na.rm = T))
+```
+
+Our suspicions are confirmed, there is significant variation in democracy scores across different regions of the world. Perhaps we think that GDP per capita has some relationship with democracy. We can look at the mean values of democracy and GDP per capita at the same time:
+
+```{r eval = FALSE}
+civilwar %>%
+  filter(year == 1999) %>%
+  group_by(region) %>%
+  summarise(democracy_mean = mean(polity2, na.rm = T),
+            gdppc_mean = mean(gdppc, na.rm = T))
+```
