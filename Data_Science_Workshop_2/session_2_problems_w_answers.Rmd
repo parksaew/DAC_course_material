@@ -37,10 +37,11 @@ cw <- civilwar %>%
 summary(cw$mtn)
 ```
 
-2. Create a new variable called `mtn2` that is the same as `mtn` except with the `-99` values replaced with `NA`s. 
+2. Create a new variable called `mtn2` that is the same as `mtn` except with the `-99` values replaced with `NA`s. Don't alter the original mountain variable.
 
 ```{r }
-cw$mtn2 <- cw$mtn[cw$mtn == -99] <- NA
+cw$mtn2 <- cw$mtn
+cw$mtn2[cw$mtn2 == -99] <- NA
 ```
 
 3. Bonus: there are two ways to solve problem 2---one using `dplyr` and the other using the basic functions from last week. Try using `dplyr` to solve this problem (hint: `mutate()` and `ifelse()` might come in handy here).
