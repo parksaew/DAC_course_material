@@ -1,0 +1,94 @@
+---
+title: 'Session 2: Practice Problems'
+author: "Andrew McCormack"
+date: '2018-11-13'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE,
+                      include = TRUE)
+library(dplyr)
+```
+
+```{r echo = TRUE}
+setwd("/Users/andrewmccormack/Documents/DSC/")
+civilwar <- read.csv("fearon03.csv")
+```
+
+## Problem 1
+
+1. Load the civil war dataset.
+2. Select the `pop`, `mtn`, and `polity2` variables. Create a data frame with just those three variables along with the variables `country` and `year`. Do this using the `select()` function from `dplyr`.
+
+```{r }
+cw <- civilwar %>%
+  select(country, year, pop, mtn, polity2)
+```
+
+
+## Problem 2
+
+1. There is an issue with the mountainous terrain variable, `mtn`. Instead of `NA` values, missing data was coded as `-99`. This won't do. Ask R for a summary of the mountain variable to verify this. 
+
+```{r }
+summary(cw$mtn)
+```
+
+2. Create a new variable called `mtn2` that is the same as `mtn` except with the `-99` values replaced with `NA`s. 
+
+```{r }
+cw$mtn2 <- cw$mtn[cw$mtn == -99] <- NA
+```
+
+3. Bonus: there are two ways to solve problem 2---one using `dplyr` and the other using the basic functions from last week. Try using `dplyr` to solve this problem (hint: `mutate()` and `ifelse()` might come in handy here).
+
+```{r }
+cw <- cw %>%
+  mutate(mtn2 = ifelse(mtn == -99, NA, mtn))
+```
+
+## Problem 3
+
+1. Using the original data, create a ``dummy'' variable for observations where the value is 1 if the country is located in Sub-Saharan Africa and 0 otherwise. 
+
+```{r}
+unique(civilwar$region)
+
+cw2 <- civilwar %>%
+  mutate(sub_saharan_africa = ifelse(region == "sub-saharan africa", 1,0))
+```
+
+
+2. Select a numeric variable and calculate its average separately for countries in Sub-Saharan Africa and countries elsewhere. Try doing this using the pipe operator in `dplyr`. What is the difference in the two means?
+
+```{r}
+# Base method
+cw2$gdppc[cw2$sub_saharan_africa == 1] %>%
+  mean(na.rm = TRUE)
+
+cw2$gdppc[cw2$sub_saharan_africa == 0] %>%
+  mean(na.rm = TRUE)
+```
+```{r}
+# dplyr method
+cw2 %>%
+  group_by(sub_saharan_africa) %>%
+  summarise(gdppc_mean = mean(gdppc, na.rm = TRUE))
+```
+
+## Problem 4
+
+1. Filter the original dataset to include only the years 1989 and 1999.
+
+2. Find the means for `polity2` by region and year (hint: you can use two variables in `group_by()`). Did any regions experience democratic backsliding between 1989 and 1999? If so, which ones?
+
+```{r }
+civilwar %>%
+  filter(year %in% c(1989, 1999)) %>%
+  group_by(region, year) %>%
+  summarise(democracy_mean = mean(polity2, na.rm = T))
+```
+*Bonus: complete steps 1 and 2 simultaneously using the pipe operator. 
