@@ -169,7 +169,8 @@ cw3 <- mutate(cw2, pop_log = log(pop))
 Alternatively, we could nest the functions inside one another
 
 ```{r eval = FALSE}
-mutate(select(filter(civilwar, country %in% c("MEXICO", "LATVIA", "BELARUS", "YEMEN")), country, pop, gdppc), pop_log = log(pop))
+mutate(select(filter(civilwar, country %in% c("MEXICO", "LATVIA", "BELARUS", "YEMEN")), 
+              country, pop, gdppc), pop_log = log(pop))
 ```
 
 Neither of these methods are terribly efficient. Let's try using the pipe operator with the first step.
