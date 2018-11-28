@@ -5,7 +5,10 @@ date: "November 21, 2018"
 output:
   pdf_document: default
   html_document: default
+fig_width: 5 
+fig_height: 2 
 ---
+
 R Markdown is a powerful tool that you can use to type up presentable results in R. There are two parts to R Markdown - the R script and text. We will first go over the text part to understand how it works, and then we will cover how to incorporate R script. 
 
 To start R Markdown, you need to start a R Markdown script. To do so, click File, New File, R Markdown. You will get a new window asking to name your document and what type of document you want.
@@ -33,7 +36,7 @@ If you want a slide break (horizontal line) do this:
 ***
 
 * bullet point
-    + subitem 
+    + subitem (need to put 4 spaces)
   
 1. numbered
 2. list
@@ -90,6 +93,8 @@ If you look down at the console of your screen, you see that you have two tabs: 
 
 ## Setting up your RMarkdown file (in the setup code chunk)
 
+(open new rmd file)
+
 In this first code chunk, I load in the data and the packages I will use in the rest of the document. You'll notice that the code chunk below will not show up when we knit the file. This is because we have specified `include = FALSE`. This tells R Markdown to (a) run the code in the code chunk, but (b) don't show the code chunk itself in the knitted document. That is, it tells R Markdown to run the code quietly. 
 
 ```{r setup, include=FALSE}
@@ -127,11 +132,17 @@ Notice that I can still run code down in the console while also writing the text
 
 ### Answer to Problem 2
 
-```{r}
+This would be in their first chunk
+
+```{r, include=FALSE}
 library(dplyr)
 
-cw <- read.csv("fearon03.csv")
+cw <- read.csv("fearon03.csv") 
 
+```
+
+
+```{r}
 war <- cw %>%
   filter(war == 1) #filter only countries at war
 
@@ -149,7 +160,7 @@ There are a number of options for how R Markdown displays and evaluates code chu
 
 The easier way is generally just to click the gear in the code box and select the option you want. This automatically changes the required code in the `{r}` options. 
 
-Compare the two code chunks below after knitting. 
+Compare the three code chunks below after knitting. 
 
 #### Example 1 (`echo = TRUE`, the default):
 
@@ -174,6 +185,19 @@ cw_alt <- cw %>%
 mean(cw_alt$log_gdppc, na.rm = TRUE)
 ```
 
+#### Example 3 (`eval = FALSE`): 
+
+```{r, eval=FALSE}
+cw_alt <- cw %>%
+  filter(war == 1) %>%
+  mutate(log_gdppc = log(gdppc),
+         log_pop = log(pop))
+
+mean(cw_alt$log_gdppc, na.rm = TRUE)
+```
+
+
+
 Hiding the R code is useful when you add plots, since you may just want to show a plot and not the code that was used to make it.
 
 #### Example 1 (`echo = TRUE`):
@@ -184,7 +208,7 @@ cwplot <- ggplot(data = cw_alt, mapping = aes(log_pop, log_gdppc)) #set the mapp
 
 cwplot +
   geom_point() + #tell it how we want to plot the data - here we want a scatter plot
-  geom_smooth() #we can add different plotting methods (with the same axes) to one plot - here we want a fitted curve
+  geom_smooth() #we can add different plotting methods (with the same axes) to one plot - here we want a fitted curve that makes patterns more visible
 ```
 
 
@@ -203,7 +227,7 @@ cwplot +
 
 I can also use these options to suppress warning and other messages:
 
-#### Example 2 (`echo = FALSE`, `message = FALSE`, `warning = FALSE`):
+#### Example 3 (`echo = FALSE`, `message = FALSE`, `warning = FALSE`):
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 cwplot <- ggplot(data = cw_alt, mapping = aes(log_pop, log_gdppc)) 
@@ -214,19 +238,13 @@ cwplot +
 ```
 
 
-If I just want to show the code and not run it, I can use the `eval = FALSE` option:
-
-```{r, eval=FALSE}
-cw_alt <- cw %>%
-  filter(war == 1) %>%
-  mutate(log_gdppc = log(gdppc),
-         log_pop = log(pop))
-
-mean(cw_alt$log_gdppc, na.rm = TRUE)
-```
-
-
 Finally, it is possible to set these options globally so that the default for each code chunk is to show or not show the code in the knitted file. To do so, you need to edit the *first* code chunk in your document - either using the gear options or by specifying the necessary arguments (e.g. `echo=FALSE`) within that chunk. 
+
+We need to use this in the first chunk:
+```{r}
+#knitr::opts_chunk$set(echo = FALSE)
+
+```
 
 
 
@@ -246,10 +264,6 @@ Finally, it is possible to set these options globally so that the default for ea
 ### Answer for Problem 3
 
 ```{r}
-library(dplyr)
-
-cw <- read.csv("fearon03.csv")
-
 war <- cw %>%
   filter(war == 1) #filter only countries at war
 
@@ -258,9 +272,6 @@ mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
 ```
 
 ```{r, echo=F}
-library(dplyr)
-
-cw <- read.csv("fearon03.csv")
 
 war <- cw %>%
   filter(war == 1) #filter only countries at war
@@ -270,9 +281,6 @@ mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
 ```
 
 ```{r, eval=F}
-library(dplyr)
-
-cw <- read.csv("fearon03.csv")
 
 war <- cw %>%
   filter(war == 1) #filter only countries at war
@@ -302,11 +310,13 @@ Let's take a look at a simple `for` loop. Let's just iterate through the numbers
 n <- 10
 print(1:n)
 
-for(i in 1:n) {
-  cat("i=", i, "\n") #print to the console \n is a line break
+for(i in 1:n) { #"i" will go through all numbers 1 through 10
+  cat("i=", i, "| ") #print to the console, \n is a line break
   the_cube <- i^3 #each time we assign a new value to the_square
-  cat(i, "cubed is:", the_cube, "\n\n")
+  cat(i, "cubed is:", the_cube, "\n")
 }
+
+#walkthrough this example for the first and second values of i
 
 ```
 
@@ -315,63 +325,39 @@ This is the same as looping through an *index variable* named *foo*. We just use
 ```{r}
 n <- 10
 for(foo in 1:n) {
-  cat("i=", foo, "\n") #\n is a line break
+  cat("i=", foo, "| ") #\n is a line break
   cubed <- foo^3 #each time we assign a new value to squared
-  cat(foo, "cubed is:", cubed, "\n\n")
+  cat(foo, "cubed is:", cubed, "\n")
 }
 
 ```
 
 
 
-Often we use `for` loop to iterate through a data set. Here we are going to create a data set of the first and last year of each country at war. 
-
-First, we create an empty data set that we are going to write values into. Then, fill up that data set by iterating through the original data set. 
-
-To create the data set, we use the `matrix` function to create a empty matrix of the same number of rows as there are countries. We also we create three columns. We then give these columns names.
+One more example:
 
 ```{r}
 
-all_countries <- unique(as.character(cw_alt$country)) #we want the country name not the factor level
+year_born <- 1994
+current_year <- 2018
 
-first_last_year <- data.frame(matrix(NA,
-                                     nrow =length(unique(all_countries)), #number of rows
-                                     ncol = 3)) #number of columns
-
-names(first_last_year) <- c("country", "first_year", "last_year") #set the names of the columns
-
-```
-
-
-
-Then, we loop through each of the countries in the data set. As we loop, we subset the data set and calculate the `min` and the `max` of each subset of the data. (Note in this case we could also use `tapply`)
-
-```{r}
-for(i in 1:length(all_countries)) { 
-  cat(all_countries[i], "\n") # see where we are in the process
-  
-  first_last_year$country[i] <- all_countries[i] #set the value for "country" in the new df
-  
-  one_country_only <- filter(cw_alt, country == all_countries[i]) #filter only the data associated with the country
-  
-  first_last_year$first_year[i] <- min(one_country_only$year) #set the value for the earliest year for the country
-  first_last_year$last_year[i] <-  max(one_country_only$year) #set the value for the latest year for the country
+for(i in year_born:current_year) { #what will be the first value of i? The second?
+  age = i - year_born
+  cat("In", i, "I was", age, "years old \n")
 }
 
-head(first_last_year)
 ```
 
-We now see that we have created a new data set with the first and last year for each country.
+
 
 
 ***
 ### *Problem 4*
 
-1. Create a dataframe called cw_1990 from the civil war data with only values from the year 1990.
+1. Create a new code chunk. Create a variable called year_first_grade and assign it the year you entered first grade and also create a variable called year_last_grade and assign the year your graduated from highschool to it.
+ 
+2. Using a `for` loop, write a code that will output a sentence like "I was in grade X in year X" for each year you were in school.
 
-2. Using a `for` loop, create a new dataframe from cw_1990 called min_max_population that stores the name of the region, the highest population value of that region, and the lowest population value of that region. (Three columns: region, max_pop and min_pop) 
-
-3. Print the first few rows of the dataframe you created using head()
 
 ***
 
@@ -379,30 +365,14 @@ We now see that we have created a new data set with the first and last year for 
 
 ```{r}
 
-cw_1990 <- filter(cw,
-             year == 1990)
+year_first_grade <- 2001
+year_last_grade <- 2012
 
-all_regions <- unique(as.character(cw_1990$region)) #we want the country name not the factor level
-
-min_max_population <- data.frame(matrix(NA,
-                                        nrow =length(unique(all_regions)),
-                                        ncol = 3))
-
-names(min_max_population) <- c("region", "max_pop", "min_pop")
-
-
-for(i in 1:length(all_regions)) { 
-  cat(all_regions[i], "\n") # see where we are in the process
-  
-  min_max_population$region[i] <- all_regions[i]
-  
-  one_region_only <- filter(cw, region == all_regions[i])
-  
-  min_max_population$max_pop[i] <- max(one_region_only$pop, na.rm = T)
-  min_max_population$min_pop[i] <-  min(one_region_only$pop, na.rm = T)
+for(i in year_first_grade:year_last_grade){
+  grade = i - year_first_grade + 1
+  cat("I was in grade", grade, "in", i, "\n")
 }
 
-head(min_max_population)
 
 
 ```
