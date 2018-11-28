@@ -1,0 +1,428 @@
+---
+title: "RMarkdown Demonstration"
+author: "Saewon Park"
+date: "November 21, 2018"
+output: html_document
+---
+R Markdown is a powerful tool that you can use to type up presentable results in R. There are two parts to R Markdown - the R script part and the text part. We will first go over the text part to understand how it works, and then move on to the script part. 
+
+To start R Markdown, you need to start a R Markdown script. To do so, click File, New File, R Markdown. You will get a new window asking to name your document and what type of document you want.
+
+First, some general formatting. When you use the hash-tag symbol, it creates a new section:
+
+# Section 1
+Notice the colour change, which means it is a section.
+
+If you use two hash-tags, you can create a sub-heading.
+
+## Sub-Section 1.1
+When you click the "Knit" button a document will be generated that includes both written content as well as the output of any embedded R code chunks within the document. You can choose the format at this point as well (HTML, PDF, Word). 
+
+### Sub-Sub-Section 1.1.1
+
+Here are some ways to format the text section:
+
+This is how you make **bold** text
+
+This is how you make *italic* text
+
+If you want a slide break (horizontal line) do this:
+
+***
+
+* bullet point
+  + subitem 
+  
+1. numbered
+2. list
+
+
+
+We can add images too:
+
+
+![Selfie Cat](selfie-cat.jpg)
+
+
+
+
+
+***
+
+### *Problem 1*
+
+1. Open a new RMarkdown file. Remove the introductory text that is there when you open the new file.
+
+2. Add in a section called "Cities" (you can put some generic text under this heading if you want) and then two sub-section headings called "Three cities I've been to" and "Three cities I want to visit"
+
+3. Under "Three cities I've been to," list three cities you've been to in bullet point format put the most recent city you visited in *italics*. Under "Three cities I want to visit" list three cities you want to visit as a numbered list and put the city you want to visit the most in **bold**.
+
+4. Knit the file to HTML. 
+
+Bonus: If you have time, you can try to download any picture and save it into the same folder as the rmd file and add it to the document.
+
+***
+
+### Answer to Problem 1
+
+# Cities
+I have two lists of cities.
+
+## Three cities I've been to
+* Boston
+* *Seoul*
+* Nairobi
+
+## Three cities I want to visit
+1. San Francisco
+2. Kisumu
+3. **Rome**
+
+![Selfie Cat](selfie-cat.jpg)
+
+
+
+
+
+
+
+
+
+# Using R Code in RMarkdown
+If you look down at the console of your screen, you see that you have two tabs: Console and R Markdown.The console section is just like what you have with a regular R Script. The R Markdown part is what knits the document.Some people like to just work in R Markdown, other people like to work with a R Script first and then convert it to R Markdown. It just depends what your preferences are. One thing: everything that you include in an R Script, you have to include in a R Markdown file (otherwise it will not knit)! This means your working directory, packages, etc. all have to be in the R Markdown file.
+
+In this first code chunk, I load in the data. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# You can quietly load in your data and packages in the setup chunk - don't forget this step, even if you've already loaded your data/packages in your regular RStudio session! 
+cw <- read.csv("fearon03.csv")
+library(dplyr)
+library(ggplot2)
+```
+
+
+To add in new code chunks, there is a button with a "C" in the top menu. Notice how in the RMarkdown file the chunk has a different shading. 
+
+I can also use code chunks to perform R functions: 
+
+
+```{r}
+summary(cw$polity2)
+```
+
+
+Notice that I can still run code down in the console while also writing the text. You can also run all of the code by pressing the green arrow at the top right hand corner of the chunk, or you can highlight it and run it that way. 
+
+***
+
+### *Problem 2*
+
+1. Continuing with the RMarkdown file you created in Problem 1, load in your data and the dplyr package.
+
+2. Create a new code chunk after the text you created earlier.
+
+3. In the code chunk, use dplyr’s filter function to separate only cases of countries at war. Then, calculate the mean GDP per capita for those countries.
+
+4. Knit the file to see what the output looks like and make sure your calculation worked correctly. Note that you can always check your work before knitting by running the code in the console.
+
+***
+
+### Answer to Problem 2
+
+```{r}
+library(dplyr)
+
+cw <- read.csv("fearon03.csv")
+
+war <- cw %>%
+  filter(war == 1) #filter only countries at war
+
+mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
+
+
+```
+
+
+## Displaying/Hiding R Code
+It is also possible only to display the output from the R code, while hiding the actual code itself. To do this, you can enter "echo=FALSE" within the {r} brackets at the start of a code chunk (i.e. {r, echo=FALSE}).
+
+The easier way is generally just to click the gear in the code box and select the option you want. This automatically changes the required code in the {r} options. 
+
+Compare the two code chunks below after knitting. 
+
+Example 1:
+
+```{r}
+cw_alt <- cw %>%
+  filter(war == 1) %>%
+  mutate(log_gdppc = log(gdppc),
+         log_pop = log(pop))
+
+mean(cw_alt$log_gdppc, na.rm = TRUE)
+
+```
+
+Example 2: 
+
+```{r, echo=FALSE}
+cw_alt <- cw %>%
+  filter(war == 1) %>%
+  mutate(log_gdppc = log(gdppc),
+         log_pop = log(pop))
+
+mean(cw_alt$log_gdppc, na.rm = TRUE)
+```
+
+
+
+
+Hiding the R code is useful when you add plots, since you may just want to show a plot and not the code that was used to make it.
+
+```{r}
+
+#install.packages("ggplot2") #ggplot2 is a commonly used package for making plots
+library(ggplot2)
+
+```
+
+
+Example 1:
+
+```{r}
+
+#quick review of ggplot
+cwplot <- ggplot(data = cw_alt, mapping = aes(log_pop, log_gdppc)) #set the mapping parameters for our plot
+
+
+cwplot +
+  geom_point() + #tell it how we want to plot the data - here we want a scatter plot
+  geom_smooth() #we can add different plotting methods (with the same axes) to one plot - here we want a fitted curve
+
+```
+
+
+Example 2:
+
+```{r, echo=FALSE}
+
+cwplot <- ggplot(data = cw_alt, mapping = aes(log_pop, log_gdppc))
+
+cwplot +
+  geom_point() + 
+  geom_smooth()
+
+```
+
+
+I can also use these options to suppress warning and other messages:
+
+Example 3:
+
+```{r, echo=FALSE, message=F, warning=F}
+
+cwplot <- ggplot(data = cw_alt, mapping = aes(log_pop, log_gdppc)) 
+
+cwplot +
+  geom_point() + 
+  geom_smooth() 
+
+```
+
+
+
+On the other hand, if I just want to show the code and not run it, I can use the eval= FALSE option
+
+```{r, eval=FALSE}
+cw_alt <- cw %>%
+  filter(war == 1) %>%
+  mutate(log_gdppc = log(gdppc),
+         log_pop = log(pop))
+
+mean(cw_alt$log_gdppc, na.rm = TRUE)
+```
+
+
+
+Finally, it is possible to set these options globally so that the default for each code chunk is to show or not show the code in the knitted file. To do so, you need to edit the *first* code chunk in your document - either using the gear options or by specifying the necessary arguments (e.g. echo=FALSE) within that chunk. 
+
+
+
+***
+### *Problem 3*
+
+1. Copy the code chunk you created in Problem 2.
+ 
+2. In the duplicate code chunk, edit the display options to only display the code output. 
+
+3. In another the duplicate code chunk, edit the display options to only display the code without running it. Knit the file and compare how RMarkdown treats each code chunk.
+
+3. Now, change the global options for the file in your first code chunk to only display the code output and re-knit the file. How does this output compare?
+
+***
+
+### Answer for Problem 3
+
+```{r}
+library(dplyr)
+
+cw <- read.csv("fearon03.csv")
+
+war <- cw %>%
+  filter(war == 1) #filter only countries at war
+
+mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
+
+```
+
+```{r, echo=F}
+library(dplyr)
+
+cw <- read.csv("fearon03.csv")
+
+war <- cw %>%
+  filter(war == 1) #filter only countries at war
+
+mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
+
+```
+
+```{r, eval=F}
+library(dplyr)
+
+cw <- read.csv("fearon03.csv")
+
+war <- cw %>%
+  filter(war == 1) #filter only countries at war
+
+mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
+
+```
+
+
+***
+
+
+# Looping
+
+Often you want to go through each observation, to iterate through observations. We can think of iteration most simply when we think of going through a list of elements. We can iterate through any set of elements. 
+
+The syntax starts with the word `for`; then comes the parentheses `(iterate_through_something)`; and then a curly brace where you can put the commands you want iterated. A curly brace also closes the process. 
+
+Within the parentheses, you first have an *index variable*, often called *i* That is the thing that is going to change every time you go through the for loop. The second thing is what you are iterating over.
+
+Note that the use of the letter *i* is arbitrary. We can call *i* anything. And each time we go through the loop, *i* takes on a different value. 
+
+Let's take a look at a simple `for` loop. Let's just iterate through the numbers 1 through 10 and print out the cube of each number.
+
+```{r}
+
+n <- 10
+print(1:n)
+
+for(i in 1:n) {
+  cat("i=", i, "\n") #print to the console \n is a line break
+  the_cube <- i^3 #each time we assign a new value to the_square
+  cat(i, "cubed is:", the_cube, "\n\n")
+}
+
+```
+
+This is the same as looping through an *index variable* named *foo*. We just use *i* in social statistics because it often makes sense. We can see in the example below that we get exactly the same result if we use *foo*. 
+
+```{r}
+n <- 10
+for(foo in 1:n) {
+  cat("i=", foo, "\n") #\n is a line break
+  cubed <- foo^3 #each time we assign a new value to squared
+  cat(foo, "cubed is:", cubed, "\n\n")
+}
+
+```
+
+
+
+Often we use `for` loop to iterate through a data set. Here we are going to create a data set of the first and last year of each country at war. 
+
+First, we create an empty data set that we are going to write values into. Then, fill up that data set by iterating through the original data set. 
+
+To create the data set, we use the `matrix` function to create a empty matrix of the same number of rows as there are countries. We also we create three columns. We then give these columns names.
+
+```{r}
+
+all_countries <- unique(as.character(cw_alt$country)) #we want the country name not the factor level
+
+first_last_year <- data.frame(matrix(NA,
+                                     nrow =length(unique(all_countries)), #number of rows
+                                     ncol = 3)) #number of columns
+
+names(first_last_year) <- c("country", "first_year", "last_year") #set the names of the columns
+
+```
+
+
+
+Then, we loop through each of the countries in the data set. As we loop, we subset the data set and calculate the `min` and the `max` of each subset of the data. (Note in this case we could also use `tapply`)
+
+```{r}
+for(i in 1:length(all_countries)) { 
+  cat(all_countries[i], "\n") # see where we are in the process
+  
+  first_last_year$country[i] <- all_countries[i] #set the value for "country" in the new df
+  
+  one_country_only <- filter(cw_alt, country == all_countries[i]) #filter only the data associated with the country
+  
+  first_last_year$first_year[i] <- min(one_country_only$year) #set the value for the earliest year for the country
+  first_last_year$last_year[i] <-  max(one_country_only$year) #set the value for the latest year for the country
+}
+
+head(first_last_year)
+```
+
+We now see that we have created a new data set with the first and last year for each country.
+
+
+***
+### *Problem 4*
+
+1. Create a dataframe called cw_1990 from the civil war data with only values from the year 1990.
+
+2. Using a `for` loop, create a new dataframe from cw_1990 called min_max_population that stores the name of the region, the highest population value of that region, and the lowest population value of that region. (Three columns: region, max_pop and min_pop) 
+
+3. Print the first few rows of the dataframe you created using head()
+
+***
+
+### Answer to Problem 4
+
+```{r}
+
+cw_1990 <- filter(cw,
+             year == 1990)
+
+all_regions <- unique(as.character(cw_1990$region)) #we want the country name not the factor level
+
+min_max_population <- data.frame(matrix(NA,
+                                        nrow =length(unique(all_regions)),
+                                        ncol = 3))
+
+names(min_max_population) <- c("region", "max_pop", "min_pop")
+
+
+for(i in 1:length(all_regions)) { 
+  cat(all_regions[i], "\n") # see where we are in the process
+  
+  min_max_population$region[i] <- all_regions[i]
+  
+  one_region_only <- filter(cw, region == all_regions[i])
+  
+  min_max_population$max_pop[i] <- max(one_region_only$pop, na.rm = T)
+  min_max_population$min_pop[i] <-  min(one_region_only$pop, na.rm = T)
+}
+
+head(min_max_population)
+
+
+```
+
