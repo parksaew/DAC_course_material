@@ -28,6 +28,14 @@ library(dplyr)
 multiplying the existing GDP per capita and population variables together. Assign the modified dataset
 to a new object called cw3.
 
+```{r}
+civilwar %>%
+  mutate(gdp = gdppc*pop) %>%
+  filter(oil == 0) %>%
+  select(country, year, gdp)
+```
+
+
 2) Next, filter out all countries that are not oil producers and then select only the gdp variable along with
 the country and year columns from the dataset.
 

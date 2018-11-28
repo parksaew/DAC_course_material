@@ -137,18 +137,6 @@ cwplot +
 
 # Facetting
 
-```{r}
-cw98 <- civilwar %>%
-  filter(year==1998)
-```
-
-Perhaps we want greater detail than regional trends and instead want to plot country-level trends of democracy across time. We can work with the original `civilwar` dataframe to do this. Let's use `group` instead of `colour` as our aesthetic for the `country` variable:
-
-```{r}
-ggplot(cw98, aes(x = log(gdppc), y = polity2)) +
-  geom_point(aes(group = country))
-```
-
 Perhaps we want to see how democracy scores and GDP per capita are distributed within each region. We can use the `facet_wrap()` function to create multiple plots that can be compared side-by-side:
 
 ```{r}
@@ -157,6 +145,8 @@ ggplot(cw98, aes(x = log(gdppc), y = polity2)) +
   geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~region)
 ```
+
+Inside `facet_wrap()` we type `~region` to tell ggplot to create a different plot for each region.
 
 # Line plots
 

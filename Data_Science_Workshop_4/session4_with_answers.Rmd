@@ -2,16 +2,18 @@
 title: "RMarkdown Demonstration"
 author: "Saewon Park"
 date: "November 21, 2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
-R Markdown is a powerful tool that you can use to type up presentable results in R. There are two parts to R Markdown - the R script part and the text part. We will first go over the text part to understand how it works, and then move on to the script part. 
+R Markdown is a powerful tool that you can use to type up presentable results in R. There are two parts to R Markdown - the R script and text. We will first go over the text part to understand how it works, and then we will cover how to incorporate R script. 
 
 To start R Markdown, you need to start a R Markdown script. To do so, click File, New File, R Markdown. You will get a new window asking to name your document and what type of document you want.
 
-First, some general formatting. When you use the hash-tag symbol, it creates a new section:
+First, some general formatting. When you use the hash-tag symbol (#), it creates a new section header:
 
 # Section 1
-Notice the colour change, which means it is a section.
+Notice the colour of the text change---this means that R Markdown recognized this as a section header
 
 If you use two hash-tags, you can create a sub-heading.
 
@@ -31,7 +33,7 @@ If you want a slide break (horizontal line) do this:
 ***
 
 * bullet point
-  + subitem 
+    + subitem 
   
 1. numbered
 2. list
@@ -81,17 +83,14 @@ I have two lists of cities.
 ![Selfie Cat](selfie-cat.jpg)
 
 
-
-
-
-
-
-
-
 # Using R Code in RMarkdown
-If you look down at the console of your screen, you see that you have two tabs: Console and R Markdown.The console section is just like what you have with a regular R Script. The R Markdown part is what knits the document.Some people like to just work in R Markdown, other people like to work with a R Script first and then convert it to R Markdown. It just depends what your preferences are. One thing: everything that you include in an R Script, you have to include in a R Markdown file (otherwise it will not knit)! This means your working directory, packages, etc. all have to be in the R Markdown file.
 
-In this first code chunk, I load in the data. 
+If you look down at the console of your screen, you see that you have two tabs: Console and R Markdown. The console section is just like what you have with a regular R Script. The R Markdown part is what knits the document.Some people like to just work in R Markdown, other people like to work with a R Script first and then convert it to R Markdown. It just depends what your preferences are. One thing: everything that you include in an R Script, you have to include in a R Markdown file (otherwise it will not knit)! This means your working directory, packages, etc. all have to be in the R Markdown file.
+
+
+## Setting up your RMarkdown file (in the setup code chunk)
+
+In this first code chunk, I load in the data and the packages I will use in the rest of the document. You'll notice that the code chunk below will not show up when we knit the file. This is because we have specified `include = FALSE`. This tells R Markdown to (a) run the code in the code chunk, but (b) don't show the code chunk itself in the knitted document. That is, it tells R Markdown to run the code quietly. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -102,20 +101,17 @@ library(dplyr)
 library(ggplot2)
 ```
 
+## Running code in R code chunks
 
-To add in new code chunks, there is a button with a "C" in the top menu. Notice how in the RMarkdown file the chunk has a different shading. 
+Now that I have the `cw` dataset and `dplyr`/`ggplot2` packages loaded, I can conduct some analysis. Let's start a new code chunk where we will run some commands. To add in new code chunks, there is a button with a "C" and a plus sign in the top menu. You can also do this manually. Notice how in the RMarkdown file the chunk has a different shading. 
 
-I can also use code chunks to perform R functions: 
-
+Let's look at some simple descriptive statistics:
 
 ```{r}
 summary(cw$polity2)
 ```
 
-
 Notice that I can still run code down in the console while also writing the text. You can also run all of the code by pressing the green arrow at the top right hand corner of the chunk, or you can highlight it and run it that way. 
-
-***
 
 ### *Problem 2*
 
@@ -140,19 +136,22 @@ war <- cw %>%
   filter(war == 1) #filter only countries at war
 
 mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
-
-
 ```
 
 
 ## Displaying/Hiding R Code
-It is also possible only to display the output from the R code, while hiding the actual code itself. To do this, you can enter "echo=FALSE" within the {r} brackets at the start of a code chunk (i.e. {r, echo=FALSE}).
 
-The easier way is generally just to click the gear in the code box and select the option you want. This automatically changes the required code in the {r} options. 
+There are a number of options for how R Markdown displays and evaluates code chunks, here are the three most useful:
+
+* `echo = FALSE`: display the output from the R code, while hiding the actual code itself
+* `eval = FALSE`: display the code but do not run it, no output is created because nothing has been evaluated
+* `include = FALSE`: evaluate the code, but don't display it or the output it creates
+
+The easier way is generally just to click the gear in the code box and select the option you want. This automatically changes the required code in the `{r}` options. 
 
 Compare the two code chunks below after knitting. 
 
-Example 1:
+#### Example 1 (`echo = TRUE`, the default):
 
 ```{r}
 cw_alt <- cw %>%
@@ -164,7 +163,7 @@ mean(cw_alt$log_gdppc, na.rm = TRUE)
 
 ```
 
-Example 2: 
+#### Example 2 (`echo = FALSE`): 
 
 ```{r, echo=FALSE}
 cw_alt <- cw %>%
@@ -175,35 +174,21 @@ cw_alt <- cw %>%
 mean(cw_alt$log_gdppc, na.rm = TRUE)
 ```
 
-
-
-
 Hiding the R code is useful when you add plots, since you may just want to show a plot and not the code that was used to make it.
 
-```{r}
-
-#install.packages("ggplot2") #ggplot2 is a commonly used package for making plots
-library(ggplot2)
-
-```
-
-
-Example 1:
+#### Example 1 (`echo = TRUE`):
 
 ```{r}
-
 #quick review of ggplot
 cwplot <- ggplot(data = cw_alt, mapping = aes(log_pop, log_gdppc)) #set the mapping parameters for our plot
-
 
 cwplot +
   geom_point() + #tell it how we want to plot the data - here we want a scatter plot
   geom_smooth() #we can add different plotting methods (with the same axes) to one plot - here we want a fitted curve
-
 ```
 
 
-Example 2:
+#### Example 2 (`echo = FALSE`):
 
 ```{r, echo=FALSE}
 
@@ -218,21 +203,18 @@ cwplot +
 
 I can also use these options to suppress warning and other messages:
 
-Example 3:
+#### Example 2 (`echo = FALSE`, `message = FALSE`, `warning = FALSE`):
 
-```{r, echo=FALSE, message=F, warning=F}
-
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 cwplot <- ggplot(data = cw_alt, mapping = aes(log_pop, log_gdppc)) 
 
 cwplot +
   geom_point() + 
   geom_smooth() 
-
 ```
 
 
-
-On the other hand, if I just want to show the code and not run it, I can use the eval= FALSE option
+If I just want to show the code and not run it, I can use the `eval = FALSE` option:
 
 ```{r, eval=FALSE}
 cw_alt <- cw %>%
@@ -244,8 +226,7 @@ mean(cw_alt$log_gdppc, na.rm = TRUE)
 ```
 
 
-
-Finally, it is possible to set these options globally so that the default for each code chunk is to show or not show the code in the knitted file. To do so, you need to edit the *first* code chunk in your document - either using the gear options or by specifying the necessary arguments (e.g. echo=FALSE) within that chunk. 
+Finally, it is possible to set these options globally so that the default for each code chunk is to show or not show the code in the knitted file. To do so, you need to edit the *first* code chunk in your document - either using the gear options or by specifying the necessary arguments (e.g. `echo=FALSE`) within that chunk. 
 
 
 
@@ -306,11 +287,11 @@ mean(war$gdppc, na.rm = T) #mean of the GDPpc of countries at war
 
 # Looping
 
-Often you want to go through each observation, to iterate through observations. We can think of iteration most simply when we think of going through a list of elements. We can iterate through any set of elements. 
+To perform the same function on multiple elements (e.g. vectors, dataframes, lists), we may want to iterate with a for loop. We can think of iteration most simply when we think of going through a list of elements and doing something to each of the elements. We can iterate through any set of elements. 
 
-The syntax starts with the word `for`; then comes the parentheses `(iterate_through_something)`; and then a curly brace where you can put the commands you want iterated. A curly brace also closes the process. 
+The syntax starts with the word `for`, followed by parentheses `(iterate_through_something)`, and then a curly brace where you can put the commands you want to iterate through. A curly brace also closes the process. 
 
-Within the parentheses, you first have an *index variable*, often called *i* That is the thing that is going to change every time you go through the for loop. The second thing is what you are iterating over.
+Within the parentheses, you need an *index variable*, often called *i* (though it is up to you what the index variable is called). This is the thing that is going to change every time you go through the for loop. The second thing is what you are iterating over.
 
 Note that the use of the letter *i* is arbitrary. We can call *i* anything. And each time we go through the loop, *i* takes on a different value. 
 
